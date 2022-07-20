@@ -41,6 +41,7 @@ repositories {
     mavenCentral()
     jcenter()
     google()
+    maven ("https://www.jetbrains.com/intellij-repository/releases") //为解决编译未找到错误而添加
 }
 dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.17.0")
@@ -97,20 +98,24 @@ tasks {
         sinceBuild(pluginSinceBuild)
         untilBuild(pluginUntilBuild)
 
-        // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
-        pluginDescription(
-            closure {
-                File("./README.md").readText().lines().run {
-                    val start = "<!-- Plugin description -->"
-                    val end = "<!-- Plugin description end -->"
+        //todo 报告文件未找到错误，暂时注释
 
-                    if (!containsAll(listOf(start, end))) {
-                        throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
-                    }
-                    subList(indexOf(start) + 1, indexOf(end))
-                }.joinToString("\n").run { markdownToHTML(this) }
-            }
-        )
+        // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
+//        pluginDescription(
+//            closure {
+//                File("./README.md").readText().lines().run {
+//                    val start = "<!-- Plugin description -->"
+//                    val end = "<!-- Plugin description end -->"
+//
+//                    if (!containsAll(listOf(start, end))) {
+//                        throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
+//                    }
+//                    subList(indexOf(start) + 1, indexOf(end))
+//                }.joinToString("\n").run { markdownToHTML(this) }
+//            }
+//        )
+
+
 
         // Get the latest available change notes from the changelog file
         changeNotes(
@@ -132,4 +137,12 @@ tasks {
         // https://jetbrains.org/intellij/sdk/docs/tutorials/build_system/deployment.html#specifying-a-release-channel
         channels(pluginVersion.split('-').getOrElse(1) { "default" }.split('.').first())
     }
+
+
+    instrumentCode {
+        setCompilerVersion( "211.7628.21" ) //为解决编译未找到错误而添加
+    }
+
+
+
 }
